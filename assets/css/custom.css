@@ -229,7 +229,7 @@ section > * {
 
 
 .services-table thead th {
-  background-color: #689b5b;  
+  background-color: #000000;  
   color: white;                
   font-weight: bold;            
   padding: 10px;
@@ -244,5 +244,211 @@ section > * {
 
 
 .services-table tbody tr:nth-child(odd) {
-  background-color: #c0cfa8;   
+  background-color: #797d73;   
+}
+.services-table tbody tr:nth-child(even) {
+  background-color: #464940;   
+}
+
+
+
+
+.header-social-links a {
+  font-size: 20px;
+  color: #fff;
+  opacity: 0;
+  animation: fadeIn 4s forwards, floatIcon 5s infinite ease-in-out; 
+}
+
+
+.header-social-links a:nth-child(1) { animation-delay: 0.7s; }
+.header-social-links a:nth-child(2) { animation-delay: 0.8s; }
+.header-social-links a:nth-child(3) { animation-delay: 0.9s; }
+.header-social-links a:nth-child(4) { animation-delay: 1s; }
+
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.container.text-center {
+  opacity: 0;
+  transform: translateY(25px);
+  animation: floatIn 2.6s ease-out forwards;
+}
+
+@keyframes floatIn {
+  0% {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+#preloader {
+  position: fixed;
+  inset: 0;
+  background: #0b1520;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+
+  animation: preloader-hide 2.5s ease-out forwards;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(720deg);
+  }
+}
+
+@keyframes preloader-hide {
+  0%, 70% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+
+#services {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+#services::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background: linear-gradient(
+    -45deg,
+    #e6d54f,
+    #feca57,
+    #dfc57c,
+    #e09b5a
+  );
+  background-size: 400% 400%;
+  animation: servicesGradientMove 14s ease infinite;
+  opacity: 0.9; /* jei per ryšku – sumažink */
+}
+
+/* Gradiento judėjimo animacija */
+@keyframes servicesGradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Kad tekstas būtų kontrastingas */
+#services .section-title,
+#services,
+#services h2,
+#services p,
+#services .description-title {
+  color: #ffffff;
+}
+
+
+
+
+
+/* ===== Vartotojams su prefers-reduced-motion ===== */
+@media (prefers-reduced-motion: reduce) {
+
+  /* Social ikonų animacijos OFF */
+  .header-social-links a {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Hero tekstas be animacijos */
+  .container.text-center {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Preloaderis be animacijos */
+  #preloader {
+    animation: none !important;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  /* Spinneris nesuka */
+  .spinner {
+    animation: none !important;
+  }
+  #services::before {
+    animation: none;
+    background-position: 50% 50%;
+}
+}
+
+
+#about {
+  position: relative;
+  overflow: hidden;
+}
+
+#about::before {
+  content: "";
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: rgba(63, 122, 35, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  top: 20%;
+  right: 150px;
+
+  animation: rotateSquare 12s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotateSquare {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.15);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
 }
