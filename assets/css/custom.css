@@ -452,3 +452,26 @@ section > * {
     transform: rotate(360deg) scale(1);
   }
 }
+
+
+
+#success-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50; /* Žalia sėkmės spalva */
+  color: white;
+  padding: 15px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
+}
+
+#success-popup.show {
+  opacity: 1;
+  pointer-events: auto;
+}
