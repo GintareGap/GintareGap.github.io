@@ -901,6 +901,52 @@
       </div>
 
     </section>
+
+    <section id="mano-zaidimas">
+      <div class="container">
+          <h2>Mano žaidimas</h2>
+
+          <!-- Sudėtingumo pasirinkimas ir mygtukai -->
+          <div class="game-top">
+              <div class="game-controls">
+                  <label for="sudetingumas">Pasirinkite sudėtingumą:</label>
+                  <select id="sudetingumas">
+                      <option value="easy">Lengvas (4 × 3)</option>
+                      <option value="hard">Sunkus (6 × 4)</option>
+                  </select>
+              </div>
+
+              <div class="game-buttons">
+                  <button id="startGame">Start</button>
+                  <button id="resetGame">Atnaujinti</button>
+              </div>
+          </div>
+
+          <div class="game-layout">
+              <!-- Žaidimų lenta (kortelių tinklelis) -->
+              <div id="zaidimo-lenta" class="game-board">
+                  <!-- Kortelės bus sugeneruotos dinamiškai su JS -->
+              </div>
+
+              <!-- Statistika šalia lentos -->
+              <aside class="game-stats">
+                  <h3>Statistika</h3>
+                  <p>Ėjimų (bandymų) skaičius: <span id="ejimu-skaicius">0</span></p>
+                  <p>Sutapusių porų skaičius: <span id="poru-skaicius">0</span></p>
+
+                  <p>Laikas: <span id="laikmatis">00:00</span></p>
+
+                  <!-- Geriausi rezultatai pagal sudėtingumą -->
+                  <p>Geriausias rezultatas (Lengvas): <span id="best-easy">-</span></p>
+                  <p>Geriausias rezultatas (Sunkus): <span id="best-hard">-</span></p>
+                  <p id="winMessage" class="win-message"></p>
+              </aside>
+          </div>
+          
+      </div>
+    </section>
+
+
  
   </main> 
 <!--
