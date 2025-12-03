@@ -318,3 +318,268 @@ form.addEventListener("submit", function (e) {
 });
 
 });
+
+
+
+
+// === MANO ŽAIDIMAS su localStorage + laikmačiu ===
+document.addEventListener("DOMContentLoaded", function () {
+    const difficultySelect = document.getElementById("sudetingumas");
+    const board = document.getElementById("zaidimo-lenta");
+    const movesSpan = document.getElementById("ejimu-skaicius");
+    const pairsSpan = document.getElementById("poru-skaicius");
+    const startBtn = document.getElementById("startGame");
+    const resetBtn = document.getElementById("resetGame");
+    const winMessage = document.getElementById("winMessage");
+
+    // laikmatis
+    const timerSpan = document.getElementById("laikmatis");
+
+    // geriausi rezultatai (HTML elementai)
+    const bestEasySpan = document.getElementById("best-easy");
+    const bestHardSpan = document.getElementById("best-hard");
+
+    // 2. Duomenų rinkinys kortelėms (mažiausiai 6 unikalūs elementai)
+    const symbols = ["🍎","🍌","🍇","🍒","🍉","🍓","🥝","🍍","🥑","🍑","🍋","🥥"];
+
+    // Būsena
+    let cards = [];
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let moves = 0;
+    let matchedPairs = 0;
+    let totalPairs = 0;
+    let currentDifficulty = "easy";
+    let gameStarted = false; // nauja: žaidimas aktyvus tik po Start
+
+    // Laikmačio būsena
+    let timerInterval = null;
+    let secondsElapsed = 0;
+
+    // --- localStorage raktai ---
+    const BEST_EASY_KEY = "memoryBest_easy";
+    const BEST_HARD_KEY = "memoryBest_hard";
+
+    // ===== Laikmatis =====
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        const mm = m.toString().padStart(2, "0");
+        const ss = s.toString().padStart(2, "0");
+        return `${mm}:${ss}`;
+    }
+
+    function updateTimerDisplay() {
+        if (!timerSpan) return; // apsauga, jei HTML dar nėra
+        timerSpan.textContent = formatTime(secondsElapsed);
+    }
+
+    function startTimer() {
+        // visada paleidžiam nuo nulio naujam žaidimui
+        if (timerInterval) {
+            clearInterval(timerInterval);
+        }
+        secondsElapsed = 0;
+        updateTimerDisplay();
+
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            updateTimerDisplay();
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    }
+
+    // ===== localStorage – geriausi rezultatai =====
+    function loadBestScores() {
+        const bestEasy = localStorage.getItem(BEST_EASY_KEY);
+        const bestHard = localStorage.getItem(BEST_HARD_KEY);
+
+        if (bestEasySpan) {
+            bestEasySpan.textContent = bestEasy ? bestEasy + " ėjimai" : "-";
+        }
+        if (bestHardSpan) {
+            bestHardSpan.textContent = bestHard ? bestHard + " ėjimai" : "-";
+        }
+    }
+
+    function updateBestScoreIfNeeded() {
+        // kviečiam tik kai žaidimas laimėtas
+        const key = currentDifficulty === "easy" ? BEST_EASY_KEY : BEST_HARD_KEY;
+        const bestSpan = currentDifficulty === "easy" ? bestEasySpan : bestHardSpan;
+
+        const stored = localStorage.getItem(key);
+        if (!stored || moves < parseInt(stored, 10)) {
+            // dabartinis rezultatas geresnis -> atnaujinam
+            localStorage.setItem(key, moves.toString());
+            if (bestSpan) {
+                bestSpan.textContent = moves + " ėjimai";
+            }
+        }
+    }
+
+    // 3. Sudėtingumo nustatymai (Lengvas 4×3, Sunkus 6×4)
+    function getSettingsByDifficulty(value) {
+        switch (value) {
+            case "easy":
+                // 4 × 3 = 12 kortelių = 6 porų
+                return { pairs: 6, columns: 4 };
+            case "hard":
+                // 6 × 4 = 24 kortelės = 12 porų
+                return { pairs: 12, columns: 6 };
+            default:
+                return { pairs: 6, columns: 4 };
+        }
+    }
+
+    // Bendra funkcija žaidimui sukurti / atnaujinti
+    function initGame() {
+        currentDifficulty = difficultySelect.value;
+
+        const settings = getSettingsByDifficulty(currentDifficulty);
+
+        // pradinė būsena
+        board.innerHTML = "";
+        if (winMessage) winMessage.textContent = "";
+        moves = 0;
+        matchedPairs = 0;
+        totalPairs = settings.pairs;
+        movesSpan.textContent = "0";
+        pairsSpan.textContent = "0";
+        firstCard = null;
+        secondCard = null;
+        lockBoard = false;
+        gameStarted = false; // kol nepaspaustas Start – nežaidžiam
+
+        // laikmatį išvalom, bet nepaleidžiam (paleis startNewGame)
+        stopTimer();
+        secondsElapsed = 0;
+        updateTimerDisplay();
+
+        // nustatom stulpelius
+        board.style.gridTemplateColumns = `repeat(${settings.columns}, 1fr)`;
+
+        // 2a, 2b – duomenų rinkinys ir poros:
+        const chosenSymbols = symbols.slice(0, settings.pairs); // imame tiek, kiek reikia porų
+        cards = [...chosenSymbols, ...chosenSymbols]            // po du kiekvieno
+            .map((symbol, index) => ({
+                id: index,
+                symbol: symbol
+            }))
+            .sort(() => Math.random() - 0.5);                   // sumaišome korteles
+
+        // Sukuriame korteles dinamiškai (2c)
+        cards.forEach(cardData => {
+            const cardEl = document.createElement("div");
+            cardEl.classList.add("card");
+            cardEl.dataset.id = cardData.id;
+            cardEl.textContent = cardData.symbol;
+
+            // 4. Kortelių apvertimo logika
+            cardEl.addEventListener("click", () => handleCardClick(cardEl, cardData));
+
+            board.appendChild(cardEl);
+        });
+    }
+
+    // funkcija naujam žaidimui: lenta + laikmatis
+    function startNewGame() {
+        initGame();
+        gameStarted = true; // dabar jau galima spausti korteles
+        startTimer();       // laikmatis startuoja tik čia
+    }
+
+    // 4. Kortelės paspaudimas
+    function handleCardClick(cardEl, cardData) {
+        if (!gameStarted) return; // NELEIDŽIAM iki Start
+        if (lockBoard) return; // neleidžiam spausti kai tikriname porą
+        if (cardEl.classList.contains("flipped") || cardEl.classList.contains("matched")) return;
+
+        cardEl.classList.add("flipped"); // 4a – apsiverčia ir parodo turinį
+
+        if (!firstCard) {
+            firstCard = { el: cardEl, data: cardData };
+            return;
+        }
+
+        if (!secondCard) {
+            secondCard = { el: cardEl, data: cardData };
+            lockBoard = true; // neleisti atversti daugiau nei 2 kortelių (4b)
+
+            moves++; // 6a – didinam ėjimus
+            movesSpan.textContent = moves.toString();
+
+            checkForMatch();
+        }
+    }
+
+    // 5. Kortelių sutapimo taisyklės
+    function checkForMatch() {
+        if (firstCard.data.symbol === secondCard.data.symbol) {
+            // 5a – jei sutampa, paliekam atverstas ir neaktyvias
+            firstCard.el.classList.add("matched");
+            secondCard.el.classList.add("matched");
+
+            matchedPairs++;                // 6b
+            pairsSpan.textContent = matchedPairs.toString();
+
+            resetSelectedCards();
+            checkWin();
+        } else {
+            // 5b – jei nesutampa, po ~1s apverčiam atgal
+            setTimeout(() => {
+                firstCard.el.classList.remove("flipped");
+                secondCard.el.classList.remove("flipped");
+                resetSelectedCards();
+            }, 1000);
+        }
+    }
+
+    function resetSelectedCards() {
+        firstCard = null;
+        secondCard = null;
+        lockBoard = false;
+    }
+
+    // 7. Laimėjimo pranešimas + localStorage + laikmatis stop
+    function checkWin() {
+        if (matchedPairs === totalPairs) {
+            if (winMessage) {
+                winMessage.textContent = "Laimėjote! 🎉";
+            }
+            stopTimer();             // laikmatis sustoja
+            gameStarted = false;
+            updateBestScoreIfNeeded(); // palyginam ir atnaujinam geriausią rezultatą
+        }
+    }
+
+    // 8. Start – pradeda pasirinktą sudėtingumą ir paleidžia laikmatį
+    startBtn.addEventListener("click", function (e) {
+        e.preventDefault();   // jei kartais mygtukas formoje
+        startNewGame();
+    });
+
+    // 9. Atnaujinti – naujas žaidimas ir naujas laikmatis
+    resetBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        startNewGame();
+    });
+
+    // 3b. Pasikeitus sudėtingumui – lenta perkurta, statistika 0, laikmatis į 00:00
+    // (čia žaidimą paruošiam, bet NEpradedam laikmačio; jis startuos paspaudus Start)
+    difficultySelect.addEventListener("change", function () {
+        initGame();
+    });
+
+    // 1a. Įkėlus puslapį – nuskaityti geriausius rezultatus ir atvaizduoti
+    loadBestScores();
+
+    // Pradiniam vaizdui paruošiam lentą, bet laikmatis kol kas nestartuoja
+    initGame();
+});
