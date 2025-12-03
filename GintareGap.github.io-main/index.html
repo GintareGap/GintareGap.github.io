@@ -90,6 +90,14 @@
     </div>
   </header>
 
+
+  <div id="preloader">
+    <div class="spinner"></div>
+    <div class="loader-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
   <main class="main">
 
     <!-- Hero Section -->
@@ -284,7 +292,7 @@
 
       <h3>Demonstracinis vaizdo įrašas</h3>
       <video controls width="640">
-        <source src="/GintareGap.github.io-main/assets/media/videolab.mp4" type="video/mp4">
+        <source src="/assets/media/videolab.mp4" type="video/mp4">
       </video>
 
       <h3>YouTube vaizdo įrašas</h3>
@@ -297,7 +305,7 @@
       </iframe>
 
       <audio controls>
-        <source src="/GintareGap.github.io-main/assets/media/quartz-clock-ticking-one-minute-253102 (1).mp3" type="audio/mpeg">
+        <source src="/assets/media/quartz-clock-ticking-one-minute-253102 (1).mp3" type="audio/mpeg">
     
       </audio>
 
@@ -824,14 +832,11 @@
     </section>-- /Gallery Section -->
 
     <!-- Contact Section -->
-    <!-- <section id="contact" class="contact section">
-
-      <!- Section Title --
+    <section id="contact" class="contact section">
       <div class="container section-title" data-aos="fade-up">
         <span class="description-title">Contact</span>
         <h2>Contact</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
-      </div><!- End Section Title ->
+      </div>
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
@@ -841,9 +846,9 @@
             <div class="info-item d-flex flex-column justify-content-center align-items-center">
               <i class="bi bi-geo-alt"></i>
               <h3>Address</h3>
-              <p>A108 Adam Street, New York, NY 535022</p>
+              <p>A108 Vilnius</p>
             </div>
-          </div><!- End Info Item ->
+          </div>
 
           <div class="col-lg-4">
             <div class="info-item d-flex flex-column justify-content-center align-items-center info-item-borders">
@@ -851,7 +856,7 @@
               <h3>Call Us</h3>
               <p>+1 5589 55488 55</p>
             </div>
-          </div><!- End Info Item --
+          </div>
 
           <div class="col-lg-4">
             <div class="info-item d-flex flex-column justify-content-center align-items-center">
@@ -859,7 +864,7 @@
               <h3>Email Us</h3>
               <p>info@example.com</p>
             </div>
-          </div><!- End Info Item --
+          </div>
 
         </div>
 
@@ -891,11 +896,57 @@
             </div>
 
           </div>
-        </form>End Contact Form ->
+        </form>
 
       </div>
 
-    </section><!- /Contact Section -->
+    </section>
+
+    <section id="mano-zaidimas">
+      <div class="container">
+          <h2>Mano žaidimas</h2>
+
+          <!-- Sudėtingumo pasirinkimas ir mygtukai -->
+          <div class="game-top">
+              <div class="game-controls">
+                  <label for="sudetingumas">Pasirinkite sudėtingumą:</label>
+                  <select id="sudetingumas">
+                      <option value="easy">Lengvas (4 × 3)</option>
+                      <option value="hard">Sunkus (6 × 4)</option>
+                  </select>
+              </div>
+
+              <div class="game-buttons">
+                  <button id="startGame">Start</button>
+                  <button id="resetGame">Atnaujinti</button>
+              </div>
+          </div>
+
+          <div class="game-layout">
+              <!-- Žaidimų lenta (kortelių tinklelis) -->
+              <div id="zaidimo-lenta" class="game-board">
+                  <!-- Kortelės bus sugeneruotos dinamiškai su JS -->
+              </div>
+
+              <!-- Statistika šalia lentos -->
+              <aside class="game-stats">
+                  <h3>Statistika</h3>
+                  <p>Ėjimų (bandymų) skaičius: <span id="ejimu-skaicius">0</span></p>
+                  <p>Sutapusių porų skaičius: <span id="poru-skaicius">0</span></p>
+
+                  <p>Laikas: <span id="laikmatis">00:00</span></p>
+
+                  <!-- Geriausi rezultatai pagal sudėtingumą -->
+                  <p>Geriausias rezultatas (Lengvas): <span id="best-easy">-</span></p>
+                  <p>Geriausias rezultatas (Sunkus): <span id="best-hard">-</span></p>
+                  <p id="winMessage" class="win-message"></p>
+              </aside>
+          </div>
+          
+      </div>
+    </section>
+
+
  
   </main> 
 <!--
@@ -941,6 +992,11 @@
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
 
-</body>
 
+  
+
+
+
+</body>
+<script src="assets/js/custom.js"></script>
 </html>
